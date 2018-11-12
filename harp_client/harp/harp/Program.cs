@@ -68,6 +68,11 @@ namespace harp
                             client.Write(rasp_cmds[(int)eRaspCommands.RASP_TKCTRL_RIGHT]);
                             break;
                         }
+                    case ConsoleKey.Backspace:
+                        {
+                            client.Write(rasp_cmds[(int)eRaspCommands.RASP_SRV_SHUTDOWN]);
+                            break;
+                        }
                     default:
                         break;
                 }

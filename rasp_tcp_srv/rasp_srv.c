@@ -138,9 +138,10 @@ int main(void)
         exit(1);
     }
 
-    printf("server: waiting for connections...\n");
+    
 
     while(1) {  // main accept() loop
+        printf("server: waiting for connections...\n");
         sin_size = sizeof their_addr;
         new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &sin_size);
         if (new_fd == -1) {
@@ -167,6 +168,15 @@ int main(void)
                     {
                         printf("RASP_SRV_DISCONNECT\r\n");
                         bRunTheLoop = FALSE;
+                        break;
+                    }
+                    case RASP_SRV_SHUTDOWN_CMD:
+                    {
+                        printf("RASP_SRV_SHUTDOWN_CMD\r\n");
+                        bRunTheLoop = FALSE;
+                        printf("connection is closed. server is off.\r\n");
+                        close(new_fd);
+                        exit(0);
                         break;
                     }
                     case RASP_TKCTRL_START_CMD:
@@ -200,9 +210,6 @@ int main(void)
             }
             recv(new_fd, &buf[0], 4, MSG_WAITALL);
         }
-        printf("connection is closed. server is off.\r\n");
-        close(new_fd);
-        exit(0);
 
         // if (!fork()) { // this is the child process
         //     close(sockfd); // child doesn't need the listener
