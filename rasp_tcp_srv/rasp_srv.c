@@ -1,5 +1,5 @@
 /*
-** server.c -- a stream socket server demo
+** server.c -- a stream socket server 
 */
 
 #include <stdio.h>
@@ -15,10 +15,16 @@
 #include <sys/wait.h>
 #include <signal.h>
 
+#ifndef __cplusplus
 typedef unsigned char  bool; 
 #define BOOL bool
 #define TRUE  ((bool)1)
 #define FALSE ((bool)0)
+#define true  ((bool)1)
+#define false ((bool)0)
+#endif
+
+
 
 
 enum eRaspCommands
@@ -156,10 +162,10 @@ int main(void)
         recv(new_fd, &buf[0], 4, MSG_WAITALL);
 //        printf("\r\n%d, %d, %d, %d\r\n", buf[0],buf[1],buf[2], buf[3]);
 //        while ((buf[0] == 0xAA) && (buf[3] == 0x5A) && (buf[1] != 0x02) && (buf[2] != 0x00))
-        BOOL bRunTheLoop = TRUE;
+        bool bRunTheLoop = true;
         while(bRunTheLoop)
         {
-            printf("\r\n%d, %d, %d, %d\r\n", buf[0],buf[1],buf[2], buf[3]);
+            printf("\r\n0x%x, 0x%x, 0x%x, 0x%x\r\n", buf[0],buf[1],buf[2], buf[3]);
             if ((buf[0] == 0xAA) && (buf[3] == 0x5A))
             {
                 switch(buf[1])
@@ -167,13 +173,13 @@ int main(void)
                     case RASP_SRV_DISCONNECT_CMD:
                     {
                         printf("RASP_SRV_DISCONNECT\r\n");
-                        bRunTheLoop = FALSE;
+                        bRunTheLoop = false;
                         break;
                     }
                     case RASP_SRV_SHUTDOWN_CMD:
                     {
                         printf("RASP_SRV_SHUTDOWN_CMD\r\n");
-                        bRunTheLoop = FALSE;
+                        bRunTheLoop = false;
                         printf("connection is closed. server is off.\r\n");
                         close(new_fd);
                         exit(0);
@@ -182,6 +188,7 @@ int main(void)
                     case RASP_TKCTRL_START_CMD:
                     {
                         printf("RASP_TKCTRL_START\r\n");
+//                        system("ls");
                         break;
                     }
                     case RASP_TKCTRL_STOP_CMD:
