@@ -15,6 +15,7 @@
 #include <sys/wait.h>
 #include <signal.h>
 
+#include "motor_ctrl.h"
 #ifndef __cplusplus
 typedef unsigned char  bool; 
 #define BOOL bool
@@ -144,7 +145,7 @@ int main(void)
         exit(1);
     }
 
-    
+    init_motor();
 
     while(1) {  // main accept() loop
         printf("server: waiting for connections...\n");
@@ -188,22 +189,26 @@ int main(void)
                     case RASP_TKCTRL_START_CMD:
                     {
                         printf("RASP_TKCTRL_START\r\n");
+                        forward();
 //                        system("ls");
                         break;
                     }
                     case RASP_TKCTRL_STOP_CMD:
                     {
                         printf("RASP_TKCTRL_STOP\r\n");
+                        stop();
                         break;
                     }
                     case RASP_TKCTRL_LEFT_CMD:
                     {
                         printf("RASP_TKCTRL_LEFT\r\n");
+                        left();
                         break;
                     }
                     case RASP_TKCTRL_RIGHT_CMD:
                     {
                         printf("RASP_TKCTRL_RIGHT\r\n");
+                        right();
                         break;
                     }
                     default:
