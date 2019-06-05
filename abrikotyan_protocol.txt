@@ -1,0 +1,43 @@
+Abrikotyan protocol.
+
+This protocol defines a communication protocol between server part (raspberry pi module on the tank) and client part (remote control app on the phone).
+
+
+Message format
+  [0xAA, Size, ID, ...Payload...]
+  ---0----1----2----3----4----N---
+  
+0xAA [1 byte]: start signature
+ 
+Size [1 byte]: message whole size
+  
+Messages IDs[1 byte]:
+ - MOTOR_CTRL: 0x39		(from client to server, dictates direction and intensity for each motor)
+ - TANK_STATE: 0x61		(from server to client, response with current direction and intensity for each motor and battery level)
+ 
+Messages Paylods:
+- MOTOR_CTRL: 0x39:
+   MOTOR1_DIRECTION[1 byte - 1 forward; 2 backward]
+   MOTOR1_INTENSITY[1 byte - 0..100]
+   MOTOR2_DIRECTION[1 byte - 1 forward; 2 backward]
+   MOTOR2_INTENSITY[1 byte - 0..100]
+
+- TANK_STATE: 0x61:
+   MOTOR1_DIRECTION[1 byte -  1 forward; 2 backward]
+   MOTOR1_INTENSITY[1 byte - 0..100]
+   MOTOR2_DIRECTION[1 byte -  1 forward; 2 backward]
+   MOTOR2_INTENSITY[1 byte - 0..100]
+   BATT_STATE[2 bytes - TBD]
+   
+
+Example:
+
+ 0xAA, 0x07, 0x39, 0x01, 0x35, 0x01, 0x35
+ MOTOR_CTRL message to turn motor1 forward with intensity 35, motor2 forward with intensity 35.   
+ 
+
+
+Remark A.
+Motor1: controls right track
+Motor2: controls left track
+
