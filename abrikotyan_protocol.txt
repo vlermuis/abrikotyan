@@ -17,22 +17,18 @@ Messages IDs[1 byte]:
  
 Messages Paylods:
 - MOTOR_CTRL: 0x39:
-   MOTOR1_DIRECTION[1 byte - 1 forward; 2 backward]
-   MOTOR1_INTENSITY[1 byte - 0..100]
-   MOTOR2_DIRECTION[1 byte - 1 forward; 2 backward]
-   MOTOR2_INTENSITY[1 byte - 0..100]
+   MOTOR1_INTENSITY[1 byte  -100..100] value below zero represent backward direction
+   MOTOR2_INTENSITY[1 byte  -100..100] value below zero represent backward direction
 
 - TANK_STATE: 0x61:
-   MOTOR1_DIRECTION[1 byte -  1 forward; 2 backward]
-   MOTOR1_INTENSITY[1 byte - 0..100]
-   MOTOR2_DIRECTION[1 byte -  1 forward; 2 backward]
-   MOTOR2_INTENSITY[1 byte - 0..100]
+   MOTOR1_INTENSITY[1 byte  -100..100] value below zero represent backward direction
+   MOTOR2_INTENSITY[1 byte  -100..100] value below zero represent backward direction
    BATT_STATE[2 bytes - TBD]
    
 
 Example:
 
- 0xAA, 0x07, 0x39, 0x01, 0x35, 0x01, 0x35
+ 0xAA, 0x05, 0x39, 0x35, 0x35
  MOTOR_CTRL message to turn motor1 forward with intensity 35, motor2 forward with intensity 35.   
  
 
