@@ -41,6 +41,12 @@ enum eRaspCommands
     RASP_TKCTRL_RIGHT_CMD       = 0x43,
 };
 
+enum eMessageIDs
+{
+    MOTOR_CTRL = 0x39,
+    TANK_STATE = 0x61,
+};
+#define BUF_SIZE    (255)
 // unsigned char rasp_cmds[]{
 //                             { 0xAA, 0x00, 0x00, 0x5A }, //RASP_SRV_RESTART
 //                             { 0xAA, 0x01, 0x00, 0x5A }, //RASP_SRV_SHUTDOWN
@@ -79,6 +85,36 @@ void *get_in_addr(struct sockaddr *sa)
     }
 
     return &(((struct sockaddr_in6*)sa)->sin6_addr);
+}
+void motor_control(int8_t motor1, int8_t motor2)
+{
+    printf("motor1 ctrl: %d; motor2 ctrl : %d;\n", motor1, motor2);    
+    if ( (motor1 > -101) && (motor1 < 101) &&
+        (motor2 > -101) && (motor2 < 101))
+        {
+            printf("Motor1 : %d ; Motor2 : %d ;\n", motor1, motor2);
+            if (motor1 < 0)
+            {
+                set_motor1_backward_direction();
+            }
+            else
+            {
+                set_motor1_forward_direction();
+            }
+            if (motor2 < 0)
+            {
+                set_motor2_backward_direction();
+            }
+            else
+            {
+                set_motor2_forward_direction();
+            }
+            motor_intensity_update(motor1, motor2);
+        }
+        else
+        {
+            printf("Incorrect motor intensity values!\n");
+        }
 }
 
 int main(void)
@@ -159,56 +195,34 @@ int main(void)
         inet_ntop(their_addr.ss_family, get_in_addr((struct sockaddr *)&their_addr), s, sizeof s);
         printf("server: got connection from %s\n", s);
 //        send(new_fd, "Hello, world!", 13, 0);
-        unsigned char buf[32];
-        recv(new_fd, &buf[0], 4, MSG_WAITALL);
+        unsigned char buf[BUF_SIZE];
 //        printf("\r\n%d, %d, %d, %d\r\n", buf[0],buf[1],buf[2], buf[3]);
 //        while ((buf[0] == 0xAA) && (buf[3] == 0x5A) && (buf[1] != 0x02) && (buf[2] != 0x00))
         bool bRunTheLoop = true;
+        int recv_return = 0;
+        int message_size = 0;
+        int8_t m1 = 0;
+        int8_t m2 = 0;
         while(bRunTheLoop)
         {
-            printf("\r\n0x%x, 0x%x, 0x%x, 0x%x\r\n", buf[0],buf[1],buf[2], buf[3]);
-            if ((buf[0] == 0xAA) && (buf[3] == 0x5A))
+            recv_return = recv(new_fd, &buf[0], 1, MSG_WAITALL);
+            if ((buf[0] == 0xAA) && (recv_return != -1))
             {
-                switch(buf[1])
+                recv_return = recv(new_fd, &buf[0], 1, MSG_WAITALL);
+                if (recv_return != -1)
                 {
-                    case RASP_SRV_DISCONNECT_CMD:
+                    message_size = buf[0];
+                    recv_return = recv(new_fd, &buf[0], message_size - 2, MSG_WAITALL);
+                    if (recv_return != -1)
                     {
-                        printf("RASP_SRV_DISCONNECT\r\n");
-                        bRunTheLoop = false;
-                        break;
-                    }
-                    case RASP_SRV_SHUTDOWN_CMD:
+                        switch(buf[0])
                     {
-                        printf("RASP_SRV_SHUTDOWN_CMD\r\n");
-                        bRunTheLoop = false;
-                        printf("connection is closed. server is off.\r\n");
-                        close(new_fd);
-                        exit(0);
-                        break;
-                    }
-                    case RASP_TKCTRL_START_CMD:
-                    {
-                        printf("RASP_TKCTRL_START\r\n");
-                        forward();
 //                        system("ls");
-                        break;
-                    }
-                    case RASP_TKCTRL_STOP_CMD:
+                            case MOTOR_CTRL:
                     {
-                        printf("RASP_TKCTRL_STOP\r\n");
-                        stop();
-                        break;
-                    }
-                    case RASP_TKCTRL_LEFT_CMD:
-                    {
-                        printf("RASP_TKCTRL_LEFT\r\n");
-                        left();
-                        break;
-                    }
-                    case RASP_TKCTRL_RIGHT_CMD:
-                    {
-                        printf("RASP_TKCTRL_RIGHT\r\n");
-                        right();
+                                m1 = buf[1];
+                                m2 = buf[2];
+                                motor_control(m1, m2);
                         break;
                     }
                     default:
@@ -216,11 +230,9 @@ int main(void)
                         break;
                 }
             }
-            else
-            {
-                printf("Incorrect message!\r\n");
+                }
             }
-            recv(new_fd, &buf[0], 4, MSG_WAITALL);
+            memset(&buf[0], 0, BUF_SIZE);
         }
 
         // if (!fork()) { // this is the child process
