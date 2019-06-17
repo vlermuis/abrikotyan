@@ -3,18 +3,63 @@
 #include <unistd.h>
 #include <softPwm.h>  /* include header file for software PWM */
 
-	int motor1_pwm_pin = 1;            			
-	int motor1_ina_pin = 4;
-	int motor1_inb_pin = 5;
+#define SPEED_STEP      10
+#define MOTOR_DIRECTION_FORWARD         (1)
+#define MOTOR_DIRECTION_BACKWARD        (2)
+	static int motor1_pwm_pin = 1;            			
+	static int motor1_ina_pin = 4;
+	static int motor1_inb_pin = 5;
 
-	int motor2_pwm_pin = 23;
-	int motor2_ina_pin = 21;
-	int motor2_inb_pin = 22;
+	static int motor2_pwm_pin = 23;
+	static int motor2_ina_pin = 21;
+	static int motor2_inb_pin = 22;
 
     static int current_right_speed = 0;
     static int current_left_speed = 0;
-#define SPEED_STEP      10
 
+
+	static int current_right_direction = MOTOR_DIRECTION_FORWARD;
+	static int current_left_direction = MOTOR_DIRECTION_FORWARD;
+int set_motor1_forward_direction()
+{
+	if (current_right_direction != MOTOR_DIRECTION_FORWARD)
+	{
+		digitalWrite(motor1_ina_pin, LOW);
+		digitalWrite(motor1_inb_pin, HIGH);
+		current_right_direction = MOTOR_DIRECTION_FORWARD;
+	}
+	return 0;
+}
+int set_motor1_backward_direction()
+{
+	if (current_right_direction != MOTOR_DIRECTION_BACKWARD)
+	{
+		digitalWrite(motor1_ina_pin, HIGH);
+		digitalWrite(motor1_inb_pin, LOW);
+		current_right_direction = MOTOR_DIRECTION_BACKWARD;
+	}
+			return 0;
+}
+int set_motor2_forward_direction()
+{
+	if (current_left_direction != MOTOR_DIRECTION_FORWARD)
+	{
+		digitalWrite(motor2_ina_pin, LOW);
+		digitalWrite(motor2_inb_pin, HIGH);
+		current_left_direction = MOTOR_DIRECTION_FORWARD;
+	}	
+	return 0;
+}
+int set_motor2_backward_direction()
+{
+	if (current_left_direction != MOTOR_DIRECTION_BACKWARD)
+	{
+		digitalWrite(motor2_ina_pin, HIGH);
+		digitalWrite(motor2_inb_pin, LOW);
+		current_left_direction = MOTOR_DIRECTION_BACKWARD;
+	}
+	return 0;
+}
 
 int init_motor()
 {
@@ -31,10 +76,8 @@ int init_motor()
 	pinMode(motor2_inb_pin,OUTPUT);
 	
 	
-	digitalWrite(motor1_ina_pin, LOW);
-	digitalWrite(motor1_inb_pin, HIGH);
-	digitalWrite(motor2_ina_pin, LOW);
-	digitalWrite(motor2_inb_pin, HIGH);
+	set_motor1_forward_direction();
+	set_motor2_forward_direction();
 	
 	softPwmCreate(motor1_pwm_pin,0,100);
 	
@@ -91,3 +134,9 @@ int right()
     return 0;
 }
 
+int motor_intensity_update(int motor1_intensity, int motor2_intensity)
+{
+	current_right_speed = motor1_intensity;
+	current_left_speed = motor2_intensity;
+	update_speed();
+}
