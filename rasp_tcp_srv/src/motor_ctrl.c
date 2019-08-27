@@ -6,13 +6,22 @@
 #define SPEED_STEP      10
 #define MOTOR_DIRECTION_FORWARD         (1)
 #define MOTOR_DIRECTION_BACKWARD        (2)
-	static int motor1_pwm_pin = 1;            			
-	static int motor1_ina_pin = 4;
-	static int motor1_inb_pin = 5;
+	// static int motor1_pwm_pin = 1;            			
+	// static int motor1_ina_pin = 4;
+	// static int motor1_inb_pin = 5;
 
-	static int motor2_pwm_pin = 23;
-	static int motor2_ina_pin = 21;
-	static int motor2_inb_pin = 22;
+	// static int motor2_pwm_pin = 23;
+	// static int motor2_ina_pin = 21;
+	// static int motor2_inb_pin = 22;
+
+
+	static int motor1_pwm_pin = 23;//1;            			
+	static int motor1_ina_pin = 21;//4;
+	static int motor1_inb_pin = 22;//5;
+
+	static int motor2_pwm_pin = 1;//23;
+	static int motor2_ina_pin = 4;//21;
+	static int motor2_inb_pin = 5;//22;
 
     static int current_right_speed = 0;
     static int current_left_speed = 0;
