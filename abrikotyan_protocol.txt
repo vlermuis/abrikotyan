@@ -34,6 +34,6 @@ Example:
 
 
 Remark A.
-Motor1: controls right track
-Motor2: controls left track
+Motor1: controls left track
+Motor2: controls right track
 
