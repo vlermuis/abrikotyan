@@ -31,6 +31,7 @@ public class MotorState {
                 Integer.valueOf("39", 16).byteValue(),
                 (byte) leftPWM,
                 (byte) rightPWM};
+        // If you received a PWM more than 100, you should transform it into negative
     }
 
 }
