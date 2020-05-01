@@ -18,12 +18,14 @@
 
 #include "proj.config"
 
+#include "rasp_srv.h"
+
 #ifdef HAS_MOTOR_CTRL
 #include "motor_ctrl.h"
 #endif
 
 #ifndef __cplusplus
-typedef unsigned char  bool; 
+typedef unsigned char  bool;
 #define BOOL bool
 #define TRUE  ((bool)1)
 #define FALSE ((bool)0)
@@ -40,7 +42,7 @@ enum eRaspCommands
     RASP_SRV_SHUTDOWN_CMD       = 0x01,
     RASP_SRV_DISCONNECT_CMD     = 0x02,
     RASP_SYS_REBOOT_CMD         = 0x20,
-    RASP_SYS_SHUTDOWN_CMD       = 0x21,  
+    RASP_SYS_SHUTDOWN_CMD       = 0x21,
     RASP_TKCTRL_START_CMD       = 0x40,
     RASP_TKCTRL_STOP_CMD        = 0x41,
     RASP_TKCTRL_LEFT_CMD        = 0x42,
@@ -98,7 +100,7 @@ void *get_in_addr(struct sockaddr *sa)
 #ifdef HAS_MOTOR_CTRL
 void motor_control(int8_t motor1, int8_t motor2)
 {
-    printf("motor1 ctrl: %d; motor2 ctrl : %d;\n", motor1, motor2);    
+    printf("motor1 ctrl: %d; motor2 ctrl : %d;\n", motor1, motor2);
     if ( (motor1 > -101) && (motor1 < 101) &&
         (motor2 > -101) && (motor2 < 101))
         {
@@ -128,8 +130,13 @@ void motor_control(int8_t motor1, int8_t motor2)
 }
 #endif
 
-int rasp_srv_start(void)
+//int rasp_srv_start(void)
+void* rasp_srv_start(fun_ptr func)
 {
+    if (func != NULL)
+    {
+        func(335);
+    }
     int sockfd, new_fd;  // listen on sock_fd, new connection on new_fd
     struct addrinfo hints, *servinfo, *p;
     struct sockaddr_storage their_addr; // connector's address information
@@ -152,13 +159,13 @@ int rasp_srv_start(void)
     // loop through all the results and bind to the first we can
     for(p = servinfo; p != NULL; p = p->ai_next) {
         if ((sockfd = socket(p->ai_family, p->ai_socktype,
-                p->ai_protocol)) == -1) {
+                             p->ai_protocol)) == -1) {
             perror("server: socket");
             continue;
         }
 
         if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes,
-                sizeof(int)) == -1) {
+                       sizeof(int)) == -1) {
             perror("setsockopt");
             exit(1);
         }
@@ -202,7 +209,7 @@ int rasp_srv_start(void)
     int8_t m1 = 0;
     int8_t m2 = 0;
 
-    while(1) 
+    while(1)
     {  // main accept() loop
         printf("server: waiting for connections...\n");
         sin_size = sizeof their_addr;
@@ -251,7 +258,7 @@ int rasp_srv_start(void)
                 }
             }
             else
-            {   
+            {
                 if (recv_return > 0)
                 {
                     printf("%c ", buf[0]);
@@ -276,5 +283,5 @@ int rasp_srv_start(void)
         printf("......................\n");
     }
 
-    return 0;
+    return NULL;
 }
