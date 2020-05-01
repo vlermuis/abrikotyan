@@ -16,7 +16,12 @@
 #include <sys/wait.h>
 #include <signal.h>
 
+#include "proj.config"
+
+#ifdef HAS_MOTOR_CTRL
 #include "motor_ctrl.h"
+#endif
+
 #ifndef __cplusplus
 typedef unsigned char  bool; 
 #define BOOL bool
@@ -90,7 +95,7 @@ void *get_in_addr(struct sockaddr *sa)
 
     return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
-
+#ifdef HAS_MOTOR_CTRL
 void motor_control(int8_t motor1, int8_t motor2)
 {
     printf("motor1 ctrl: %d; motor2 ctrl : %d;\n", motor1, motor2);    
@@ -121,9 +126,9 @@ void motor_control(int8_t motor1, int8_t motor2)
             printf("Incorrect motor intensity values!\n");
         }
 }
+#endif
 
-
-int main(void)
+int rasp_srv_start(void)
 {
     int sockfd, new_fd;  // listen on sock_fd, new connection on new_fd
     struct addrinfo hints, *servinfo, *p;
@@ -187,7 +192,9 @@ int main(void)
         exit(1);
     }
 
+#ifdef HAS_MOTOR_CTRL
     init_motor();
+#endif
     unsigned char buf[BUF_SIZE];
     bool bRunTheLoop = true;
     int recv_return = 0;
@@ -229,9 +236,11 @@ int main(void)
                             case MOTOR_CTRL:
                             {
                                 printf("0x%x, 0x%x, 0x%x]\n", buf[0], buf[1], buf[2]);
+#ifdef HAS_MOTOR_CTRL
                                 m1 = buf[1];
                                 m2 = buf[2];
                                 motor_control(m1, m2);
+#endif
                                 break;
                             }
                             default:
