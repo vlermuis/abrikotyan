@@ -6,5 +6,5 @@ rasp_tcp_src:C - simple tcp server for remote control raspberry pi abrikotyan (i
 
 Android/Abrikotyan - android app client to control "Abrikotyan"
 
-latest updates in "develop" branch
+
 
