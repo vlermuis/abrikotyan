@@ -1,0 +1,5 @@
+Run cmake for exclude motor_ctrl module from compilation
+cmake -DHAS_RASP_SRV_ONLY=1 <folder with CMakeLists.txt>
+
+Run cmake for include test_client to compilation
+cmake -DTEST_CLIENT=1 <folder with CMakeLists.txt>
