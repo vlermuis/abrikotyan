@@ -20,9 +20,6 @@
 
 #include "rasp_srv.h"
 
-#ifdef HAS_MOTOR_CTRL
-#include "motor_ctrl.h"
-#endif
 
 #ifndef __cplusplus
 typedef unsigned char  bool;
@@ -50,11 +47,6 @@ enum eRaspCommands
 };
 
 
-enum eMessageIDs
-{
-    MOTOR_CTRL = 0x39,
-    TANK_STATE = 0x61,
-};
 
 #define BUF_SIZE    (255)
 
@@ -130,13 +122,16 @@ void motor_control(int8_t motor1, int8_t motor2)
 }
 #endif
 
-//int rasp_srv_start(void)
+
 void* rasp_srv_start(fun_ptr func)
 {
-    if (func != NULL)
+    if (func == NULL)
     {
-        func(335);
+        return NULL;
     }
+    unsigned char resp[2] = {1, 235};
+    func(&resp[0]);
+
     int sockfd, new_fd;  // listen on sock_fd, new connection on new_fd
     struct addrinfo hints, *servinfo, *p;
     struct sockaddr_storage their_addr; // connector's address information
@@ -238,22 +233,10 @@ void* rasp_srv_start(fun_ptr func)
                     recv_return = recv(new_fd, &buf[0], message_size - 2, MSG_WAITALL);
                     if (recv_return != -1)
                     {
-                        switch(buf[0])
-                        {
-                            case MOTOR_CTRL:
-                            {
-                                printf("0x%x, 0x%x, 0x%x]\n", buf[0], buf[1], buf[2]);
-#ifdef HAS_MOTOR_CTRL
-                                m1 = buf[1];
-                                m2 = buf[2];
-                                motor_control(m1, m2);
-#endif
-                                break;
-                            }
-                            default:
-                                printf("Unknown or unsupported command.");
-                                break;
-                        }
+                        unsigned char rdata[message_size - 1];
+                        rdata[0] = message_size - 1;
+                        memcpy(&rdata[1], &buf[0], message_size - 2);
+                        func(&rdata[0]);
                     }
                 }
             }

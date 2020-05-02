@@ -1,7 +1,7 @@
 #ifndef RASP_SRV_H
 #define RASP_SRV_H
 
-typedef void (*fun_ptr)(int);
+typedef void (*fun_ptr)(unsigned char *);
 
 void* rasp_srv_start(fun_ptr func);
 

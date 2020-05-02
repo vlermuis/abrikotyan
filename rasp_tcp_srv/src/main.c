@@ -3,15 +3,56 @@
 #include <pthread.h>
 #include "proj.config"
 
+#ifdef HAS_MOTOR_CTRL
+#include "motor_ctrl.h"
+#endif
+
 
 #ifdef HAS_RASP_SRV
 #include "rasp_srv.h"
 pthread_t tid[2];
+
+enum eMessageIDs
+{
+    MOTOR_CTRL = 0x39,
+    TANK_STATE = 0x61,
+};
+
 #endif
 
-void raspDispatch(int msg)
+
+
+
+void raspDispatch(unsigned  char* msg)
 {
-    printf("incoming...[%d]\n", msg);
+    int i;
+    int msg_size = *msg;
+    msg++;
+    int msg_id = *msg;
+    msg++;
+    switch(msg_id)
+    {
+#ifdef HAS_MOTOR_CTRL
+        case MOTOR_CTRL:
+            unsigned char m1 = *msg;
+            msg++;
+            unsigned char m2 = *msg;
+            printf("MOTOR_CTRL:[%d:%d]\n", m1, m2);
+            motor_control(m1, m2);
+            break;
+#endif
+        default:
+        {
+            printf("incoming...size:[%d];[%d, ", msg_size, msg_id);
+            for (i = 0; i < msg_size - 2; i++)
+            {
+                printf("%d, ", *msg);
+                msg++;
+            }
+            printf("]\n");
+        }
+        break;
+    }
 }
 
 int main()
